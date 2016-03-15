@@ -1,1 +1,120 @@
-Hi crazy
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<title>Canvas</title>
+	<style type="text/css">
+		*{
+			margin: 0px;
+			padding: 0px;
+			border: none;
+		}
+		body{
+			width: 100%;
+			height: 100%;
+			background-color: #444;
+		}
+		canvas{
+			width: 100%;
+			height: 95%;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="micanvas" style="background-color:rgb(0, 0, 0);" onmousedown="mouseDown(event)" onmouseup="mouseUp(event)">
+		
+	</canvas>
+	<script type="text/javascript">
+		var alto = window.innerHeight*95/100;
+		var ancho = window.innerWidth;
+
+		var miCanvas = document.getElementById("micanvas");
+		var ctx = miCanvas.getContext("2d");
+		miCanvas.height = alto;
+		miCanvas.width = ancho;
+
+		function ball(x,y,vel,r,grav,color){
+			this.color=color;
+			this.x = x;
+			this.y = y;
+			this.vel = vel;
+			this.r = r;
+			this.grav = grav;
+			this.cambio = true;
+			this.angulo = 0;
+
+			this.dibujar = function(){
+				this.x += vel[0]/50;
+				if(grav)vel[1] += 1081/50;
+				this.y += vel[1]/50;
+
+				
+				if(this.y+r>alto){
+					vel[1]=-vel[1]*(6/6);
+					vel[0]*=0.98;
+					this.y=alto-r;
+				}
+				if(this.y-r<0){
+					vel[1]=-vel[1]*(5/6);
+					this.y=r;
+				}
+				if(this.x+r>ancho){
+					vel[0]=-vel[0]*(5/6);
+					this.x=ancho-r;
+				}
+				if(this.x-r<0){
+					vel[0]=-vel[0]*(5/6);
+					this.x=r;
+				}
+
+
+				ctx.beginPath();
+				ctx.fillStyle=this.color;
+				ctx.arc(this.x, this.y, this.r, 0, 2*Math.PI);
+				ctx.fill();
+				ctx.font = "20px Arial";
+			}
+		}
+
+
+
+		function Bolas(){
+			this.bolas = new Array(new ball(30,30,[1220,0],30,true,"#fff"));
+			this.anadirBola = function(x,y,dir,r,grav,color){
+				this.bolas[this.bolas.length] = new ball(x,y,dir,r,grav,color);
+			}
+			this.dibujar = function(){
+				ctx.clearRect(0,0,ancho,alto);
+				for (var i = 0; i < this.bolas.length; i++) {
+					this.bolas[i].dibujar();
+					ctx.fillStyle="#111";
+					ctx.fillText(i,this.bolas[i].x-5,this.bolas[i].y+5);
+				}
+				requestAnimationFrame(function(){bolas.dibujar();});
+			}
+		}
+	
+
+		var bolas = new Bolas();
+		requestAnimationFrame(function(){bolas.dibujar();});
+
+
+
+		var x1;
+		var y1;
+		var x2;
+		var y2;
+		function mouseDown(event) {
+    		x1=event.clientX;
+ 			y1=event.clientY;
+		}
+
+		function mouseUp(event) {
+    		x2=event.clientX;
+ 			y2=event.clientY;
+ 			color = "hsl("+Math.random()*360+",95%,55%)";
+ 			bolas.anadirBola(x1,y1,[(x2-x1)*10,(y2-y1)*10],30,true,color);
+ 			//miCanvas.style.backgroundColor="hsl("+Math.random()*360+",100%,60%)";
+		}
+	</script>
+</body>
+</html>
